@@ -6,11 +6,13 @@ import { createTask } from './dto/createTask.dto';
 import { TaskStatus } from './taskStatusEnum';
 import { UpdateDto } from './dto/UpdateTask.dto';
 import { SearchDto } from './dto/searchTask.dto';
-import { TaskRepository } from './task.Repository';
 
 @Injectable()
 export class TaskService {
-  constructor(@InjectRepository(Task) private taskRepository: TaskRepository) {}
+  constructor(
+    @InjectRepository(Task)
+    private readonly taskRepository: Repository<Task>,
+  ) {}
 
   async getTaskById(id: string): Promise<Task> {
     const found = await this.taskRepository.findOne({ where: { id } });
@@ -70,9 +72,5 @@ export class TaskService {
 
     const tasks = await query.getMany();
     return tasks;
-  }
-
-  async search(filter: SearchDto) {
-    return await this.getTask(filter);
   }
 }

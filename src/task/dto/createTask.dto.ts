@@ -1,5 +1,5 @@
 import { TaskStatus } from '../taskStatusEnum';
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export class createTask {
   @IsNotEmpty({ message: 'title is required' })
@@ -10,5 +10,6 @@ export class createTask {
   description: string;
   @IsNotEmpty({ message: 'status is required' })
   @IsString()
+  @IsEnum(TaskStatus, { message: 'status must be a valid TaskStatus value' })
   status: TaskStatus;
 }

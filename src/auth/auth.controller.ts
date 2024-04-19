@@ -4,13 +4,11 @@ import {
   Param,
   Post,
   Request,
-  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { AuthService } from './auth.service';
-import { User } from './user.entity';
 
 interface AuthResponse {
   access_token: string | null;
@@ -26,7 +24,6 @@ export class AuthController {
     return this.authService.signUp(authCredentials);
   }
 
-  // @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(@Request() req): Promise<AuthResponse> {
     return this.authService.signIn(req.body);

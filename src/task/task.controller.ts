@@ -6,18 +6,20 @@ import {
   Post,
   Delete,
   Put,
-  Search,
   Query,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { Task } from './task.entity';
 import { createTask } from './dto/createTask.dto';
 import { UpdateDto } from './dto/UpdateTask.dto';
 import { SearchDto } from './dto/searchTask.dto';
+import { TaskAuthGuard } from './task.auth.guard';
 
-@Controller('task')
+@UseGuards(TaskAuthGuard)
+@Controller('/task')
 export class TaskController {
   constructor(private taskService: TaskService) {}
 
@@ -27,7 +29,7 @@ export class TaskController {
   }
 
   @Post()
-  @UsePipes(new ValidationPipe({ stopAtFirstError: true }))
+  @UsePipes(new ValidationPipe())
   async createTask(@Body() createTask: createTask): Promise<Task> {
     return await this.taskService.createTask(createTask);
   }
@@ -46,9 +48,9 @@ export class TaskController {
   @Get()
   async getAll(@Query() searchQuery: SearchDto) {
     if (Object.keys(searchQuery).length) {
-      return this.taskService.search(searchQuery);
+      return this.taskService.getTask(searchQuery);
     } else {
-      return this.taskService.search(searchQuery);
+      return this.taskService.getTask(searchQuery);
     }
   }
 }

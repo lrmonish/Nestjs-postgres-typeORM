@@ -2,7 +2,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Task } from '../src/task/task.entity';
 import { User } from '../src/auth/user.entity';
-import { Role } from 'src/role/role.entity';
+import { Role } from '../src/role/role.entity';
 
 export const typeOrmConfig = async (
   configService: ConfigService,

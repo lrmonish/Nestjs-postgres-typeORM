@@ -3,15 +3,14 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { UserRepository } from './users.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Role } from 'src/role/role.entity';
+import { Role } from '../role/role.entity';
 import { Repository } from 'typeorm';
-import { RoleService } from 'src/role/role.service';
+import { RoleService } from '../role/role.service';
 
 interface AuthResponse {
   access_token: string | null;
@@ -20,13 +19,12 @@ interface AuthResponse {
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) private usersRepository: UserRepository,
-    @InjectRepository(Role) private roleRepository: Repository<Role>,
+    @InjectRepository(User) private usersRepository: Repository<User>,
     private roleService: RoleService,
     private jwt: JwtService,
   ) {}
 
-  async signUp(authCredentials: AuthCredentialsDto): Promise<void> {
+  async signUp(authCredentials: AuthCredentialsDto): Promise<any> {
     const { username, password } = authCredentials;
     const salt = await bcrypt.genSalt();
     const hashedPass = await bcrypt.hash(password, salt);
@@ -34,22 +32,20 @@ export class AuthService {
       username,
       password: hashedPass,
     });
-    await this.usersRepository
-      .save(user)
-      .then((res) => {})
-      .catch((err) => {
-        if (err.code === '23505') {
-          throw new ConflictException('username Already Exists');
-        } else {
-          new InternalServerErrorException();
-        }
-      });
+    return await this.usersRepository.save(user).catch((err) => {
+      if (err.code === '23505') {
+        throw new ConflictException('username Already Exists');
+      } else {
+        new InternalServerErrorException();
+      }
+    });
   }
 
   async login(user: any): Promise<{ access_token: string }> {
     const payload = { username: user.username };
+    const token = this.jwt.sign(payload);
     return {
-      access_token: this.jwt.sign(payload),
+      access_token: token,
     };
   }
 

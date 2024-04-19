@@ -1,5 +1,4 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { TaskStatus } from './taskStatusEnum';
 
 @Entity()
