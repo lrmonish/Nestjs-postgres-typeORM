@@ -20,6 +20,7 @@ interface AuthResponse {
 export class AuthService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Role) private roleRepository: Repository<Role>,
     private roleService: RoleService,
     private jwt: JwtService,
   ) {}
@@ -41,8 +42,22 @@ export class AuthService {
     });
   }
 
-  async login(user: any): Promise<{ access_token: string }> {
-    const payload = { username: user.username };
+  async login(users: any): Promise<{ access_token: string }> {
+    let Roles = [];
+    const roles = await this.usersRepository.find({ relations: ['roles'] });
+    roles.map((user) => {
+      if (user.id === users.id) {
+        user.roles.map((r) => {
+          Roles.push(r.rolename);
+        });
+
+        // rolesAssociated.push(user.roles.rolename);
+        // rolesAssociated = user.roles;
+        // console.log(rolesAssociated);
+      }
+    });
+
+    const payload = { username: users.username, Roles };
     const token = this.jwt.sign(payload);
     return {
       access_token: token,
@@ -60,7 +75,9 @@ export class AuthService {
     const passCheck = await bcrypt.compare(password, user.password);
 
     if (passCheck === true) {
-      const { password, id, ...result } = user;
+      const { password, ...result } = user;
+      // console.log();
+
       return await this.login(result);
     } else {
       throw new Error('Password Mismatch');

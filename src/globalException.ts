@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -30,6 +31,22 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         timestamp: new Date().toISOString(),
         path: request.url,
         message: finalRes.message || 'Something Went Wrong',
+      });
+    } else if (exception instanceof ForbiddenException) {
+      const ctx = host.switchToHttp();
+      const response = ctx.getResponse<Response>();
+      console.log(exception.getResponse());
+      let res = exception.getResponse();
+      let statusCode = exception.getStatus();
+
+      let tempRes = JSON.stringify(res);
+      let finalRes = JSON.parse(tempRes);
+
+      response.status(HttpStatus.BAD_REQUEST).json({
+        statusCode: statusCode,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        message: 'Access Denied',
       });
     } else {
       const status =

@@ -15,7 +15,8 @@ export class TaskAuthGuard implements CanActivate {
     private readonly jwtService: JwtService,
   ) {}
 
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    console.log('inside auth guard');
     const isPublic = this.reflector.get<boolean>(
       'isPublic',
       context.getHandler(),
@@ -32,7 +33,11 @@ export class TaskAuthGuard implements CanActivate {
     const token = authHeader.split(' ')[1];
 
     try {
-      this.jwtService.verify(token);
+      const payload = await this.jwtService.verifyAsync(token);
+
+      request['user'] = payload;
+      console.log(request.user);
+
       return true;
     } catch (error) {
       throw new HttpException('Invalid token', HttpStatus.FORBIDDEN);

@@ -7,10 +7,12 @@ import { User } from '../auth/user.entity';
 import { Role } from '../role/role.entity';
 import { TaskAuthGuard } from './task.auth.guard';
 import { JwtModule } from '@nestjs/jwt';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [JwtModule, TypeOrmModule.forFeature([Task, User, Role])],
-  providers: [TaskService, TaskAuthGuard],
+  providers: [TaskService],
   controllers: [TaskController],
   exports: [TaskService],
 })
